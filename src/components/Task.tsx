@@ -1,40 +1,52 @@
-import TaskCard from "./TaskCard.tsx";
+import TaskList from "./TaskList.tsx";
+import Modal from "./Modal.tsx";
+import CreateTaskForm from "./CreateTaskForm.tsx";
+import PageHeader from "./PageHeader.tsx";
+import useTaskModal from "../hookes/useTaskModal.ts";
 import {useGetTasks} from "../hookes/useGetTasks.ts";
+import { useState, useEffect } from "react";
 
+const ITEMS_PER_PAGE = 5;
 
 const Task = () => {
-    const {tasksList, fetchState, errorMessage} = useGetTasks()
-    
-    if (fetchState === "loading") return <LoadingView/>;
-    if (fetchState === "error") return <ErrorView message={errorMessage}/>;
+    const modal = useTaskModal();
+    const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = parseInt(urlParams.get('page') || '1', 10);
+        setCurrentPage(page);
+    }, []);
+
+    const {tasksList, fetchState, errorMessage, refetch} = useGetTasks(currentPage);
+
+    const handlePageChange = (page: number) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page.toString());
+        window.history.pushState({}, '', url.toString());
+        setCurrentPage(page);
+    };
+
+    const hasNext = tasksList.length === ITEMS_PER_PAGE;
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-4xl mx-auto">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">Task Manager</h1>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {tasksList.map((task) => <TaskCard key={task.id} task={task}/>)}
-                </div>
+                <PageHeader onAddTask={modal.open} />
+                <TaskList 
+                    tasksList={tasksList} 
+                    fetchState={fetchState} 
+                    errorMessage={errorMessage} 
+                    currentPage={currentPage} 
+                    onPageChange={handlePageChange} 
+                    hasNext={hasNext} 
+                />
+                <Modal isOpen={modal.isOpen} onClose={modal.close}>
+                    <CreateTaskForm onTaskCreated={refetch} onClose={modal.close} />
+                </Modal>
             </div>
         </div>
     );
 };
-
-
-const LoadingView = () => (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500 text-lg">Loading tasks...</p>
-    </div>
-);
-
-const ErrorView = ({message}: { message: string }) => (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-            <p className="text-red-500 text-lg font-medium">Failed to load tasks</p>
-            <p className="text-gray-400 text-sm mt-1">{message}</p>
-        </div>
-    </div>
-);
-
 
 export default Task;
