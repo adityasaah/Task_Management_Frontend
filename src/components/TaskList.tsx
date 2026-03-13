@@ -1,27 +1,21 @@
 import TaskCard from "./TaskCard.tsx";
-import Pagination from "./Pagination.tsx";
-import { type TaskItem } from "../tasks/tasks.type";
+import {useGetTasks} from "../hookes/useGetTasks.ts";
 
-type FetchState = "idle" | "loading" | "success" | "error";
+const TaskList = ( ) => {
 
-interface TaskListProps {
-    tasksList: TaskItem[];
-    fetchState: FetchState;
-    errorMessage: string;
-    currentPage: number;
-    onPageChange: (page: number) => void;
-    hasNext: boolean;
-}
 
-const TaskList: React.FC<TaskListProps> = ({ tasksList, fetchState, errorMessage, currentPage, onPageChange, hasNext }) => {
+    const {tasksList, fetchState, errorMessage } = useGetTasks();
+
+
+
     if (fetchState === "loading") return <LoadingView/>;
     if (fetchState === "error") return <ErrorView message={errorMessage}/>;
+
     return (
         <div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 {tasksList.map((task) => <TaskCard key={task.id} task={task}/>)}
             </div>
-            <Pagination currentPage={currentPage} onPageChange={onPageChange} hasNext={hasNext} />
         </div>
     )
 }

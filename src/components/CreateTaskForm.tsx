@@ -3,10 +3,9 @@ import axios from 'axios';
 
 interface CreateTaskFormProps {
     onClose: () => void;
-    onTaskCreated: () => void;
 }
 
-const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose, onTaskCreated }) => {
+const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose}) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -35,7 +34,6 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose, onTaskCreated 
 
             const response = await axios.post('http://localhost:3000/tasks', newTask);
             console.log(response);
-            onTaskCreated();
             onClose();
         } catch (error) {
             console.error('Error creating task:', error);
