@@ -12,14 +12,14 @@ const TaskList = ( ) => {
     if (fetchState === "error") return <ErrorView message={errorMessage}/>;
 
     return (
-        <div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div data-testid="outer-container" >
+            <div data-testid="tasks-grid" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 {tasksList.map((task) => <TaskCard key={task.id} task={task}/>)}
             </div>
         </div>
     )
 }
-export default TaskList
+export default TaskList;
 
 
 const LoadingView = () => (

@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {type TaskItem} from "../tasks/tasks.type.ts"
+import {type FetchState, type TaskItem} from "../tasks/tasks.type.ts"
 
-type FetchState = "idle" | "loading" | "success" | "error";
+
 
 export function useGetTasks() {
     const [tasksList, setTasksList] = useState<TaskItem[]>([]);

@@ -8,3 +8,6 @@ export interface TaskItem {
     isCompleted: boolean;
     createdAt: Date;
 }
+
+
+export type FetchState = "idle" | "loading" | "success" | "error";
