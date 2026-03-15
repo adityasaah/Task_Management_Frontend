@@ -10,23 +10,24 @@ export function useGetTasks() {
     const [errorMessage, setErrorMessage] = useState<string>("");
 
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            setFetchState("loading");
-            setErrorMessage("");
+    const fetchTasks = async () => {
+        setFetchState("loading");
+        setErrorMessage("");
 
-            try {
-                const response = await axios.get(`http://localhost:3000/tasks`);
-                setTasksList(response.data.tasks || response.data); // Assuming response has tasks array, or fallback
-                setFetchState("success");
-            } catch (error) {
-                const message = axios.isAxiosError(error)
-                    ? error.response?.data?.message ?? error.message
-                    : "An unexpected error occurred";
-                setErrorMessage(message);
-                setFetchState("error");
-            }
-        };
+        try {
+            const response = await axios.get(`http://localhost:3000/tasks`);
+            setTasksList(response.data.tasks || response.data); // Assuming response has tasks array, or fallback
+            setFetchState("success");
+        } catch (error) {
+            const message = axios.isAxiosError(error)
+                ? error.response?.data?.message ?? error.message
+                : "An unexpected error occurred";
+            setErrorMessage(message);
+            setFetchState("error");
+        }
+    };
+
+    useEffect(() => {
         fetchTasks();
     },[]);
 
@@ -34,5 +35,6 @@ export function useGetTasks() {
         tasksList,
         fetchState,
         errorMessage,
+        refetch : fetchTasks
     };
 }

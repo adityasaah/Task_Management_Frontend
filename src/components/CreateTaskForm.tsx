@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 
 interface CreateTaskFormProps {
     onClose: () => void;
+    refetch: () => void;
 }
 
-const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose}) => {
+const CreateTaskForm: React.FC<CreateTaskFormProps> = ({onClose,refetch}) => {
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -16,7 +18,7 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose}) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: name === 'currentProgress' || name === 'targetProgress' ? Number(value) : value
@@ -34,6 +36,7 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose}) => {
 
             const response = await axios.post('http://localhost:3000/tasks', newTask);
             console.log(response);
+            refetch();
             onClose();
         } catch (error) {
             console.error('Error creating task:', error);

@@ -1,10 +1,14 @@
+import type {FetchState, TaskItem} from "../tasks/tasks.type.ts";
 import TaskCard from "./TaskCard.tsx";
-import {useGetTasks} from "../hookes/useGetTasks.ts";
-
-const TaskList = ( ) => {
 
 
-    const {tasksList, fetchState, errorMessage } = useGetTasks();
+interface TaskListProps {
+    tasksList: TaskItem[];
+    fetchState : FetchState;
+    errorMessage : string;
+}
+
+const TaskList = ({tasksList,fetchState,errorMessage} : TaskListProps ) => {
 
 
 
