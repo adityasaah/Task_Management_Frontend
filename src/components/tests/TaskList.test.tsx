@@ -1,21 +1,50 @@
 import {describe, it, expect, vi, beforeEach} from 'vitest'
 import {render, screen} from '@testing-library/react'
 import TaskList from '../TaskList'
-import {useGetTasks} from '../../hookes/useGetTasks'
 import type {FetchState, TaskItem} from '../../tasks/tasks.type'
+import {useTasksContext} from "../../contexts/TasksContext.tsx";
 
 // Mock the useGetTasks hook
-vi.mock('../../hookes/useGetTasks', () => ({
-    useGetTasks: vi.fn()
+vi.mock('../../contexts/TasksContext.tsx', () => ({
+    useTasksContext: vi.fn()
 }))
 
-const mockUseGetTasks = vi.mocked(useGetTasks)
+
+interface MockPaginationPropsType {
+    page: number,
+    hasMore: boolean,
+    hasPrev: boolean,
+    onPageChange: (page: number) => void,
+}
+
+vi.mock("./TaskCard.tsx", () => ({
+    default: ({ task } : {task : TaskItem}) => <div>{task.id}</div>
+}));
+
+vi.mock("./Pagination.tsx", () => ({
+    Pagination: ({ page, hasMore, hasPrev, onPageChange } : MockPaginationPropsType) => (
+        <div >
+            <span >{page}</span>
+            <span >{String(hasMore)}</span>
+            <span >{String(hasPrev)}</span>
+            <button onClick={() => onPageChange(page + 1)}>Next</button>
+            <button onClick={() => onPageChange(page - 1)}>Prev</button>
+        </div>
+    )
+}));
 
 
-const createMockReturnValue = (tasksList: TaskItem[] = [], fetchState: FetchState, errorMessage: string = '') => ({
+const mockUseTasksContext = vi.mocked(useTasksContext)
+
+
+const createMockReturnValue = (tasksList: TaskItem[] = [], fetchState: FetchState, errorMessage: string = '', page: number, onPageChange: (page: number) => void, hasMore: boolean, refetch: () => void) => ({
     tasksList,
     fetchState,
-    errorMessage
+    errorMessage,
+    page,
+    onPageChange,
+    hasMore,
+    refetch
 })
 
 const mockTask1: TaskItem = {
@@ -46,12 +75,9 @@ describe('TaskList Component', () => {
     })
 
     it('displays loading message when fetchState is loading', () => {
-        // mockUseGetTasks.mockReturnValue({
-        //     tasksList: [],
-        //     fetchState: 'loading',
-        //     errorMessage: ''
-        // })
-        mockUseGetTasks.mockReturnValue(createMockReturnValue([], 'loading', ''))
+        mockUseTasksContext.mockReturnValue(createMockReturnValue([], 'loading', '', 1, () => {
+        }, true, () => {
+        }))
 
         render(<TaskList/>)
 
@@ -61,13 +87,11 @@ describe('TaskList Component', () => {
 
     it('displays error message when fetchState is error', () => {
         const errorMessage = 'Network error occurred'
-        // mockUseGetTasks.mockReturnValue({
-        //     tasksList: [],
-        //     fetchState: 'error',
-        //     errorMessage
-        // })
 
-        mockUseGetTasks.mockReturnValue(createMockReturnValue([], 'error', errorMessage))
+        mockUseTasksContext.mockReturnValue(createMockReturnValue([], 'error', errorMessage, 1, () => {
+        }, true, () => {
+        }))
+
 
         render(<TaskList/>)
 
@@ -76,13 +100,10 @@ describe('TaskList Component', () => {
     })
 
     it('displays generic error message when errorMessage is empty and fetchState is error', () => {
-        // mockUseGetTasks.mockReturnValue({
-        //     tasksList: [],
-        //     fetchState: 'error',
-        //     errorMessage: ''
-        // })
+        mockUseTasksContext.mockReturnValue(createMockReturnValue([], 'error', '', 1, () => {
+        }, true, () => {
+        }))
 
-        mockUseGetTasks.mockReturnValue(createMockReturnValue([], 'error', ''))
 
         render(<TaskList/>)
 
@@ -94,13 +115,10 @@ describe('TaskList Component', () => {
 
 
     it('renders empty task list without crashing when fetchState is success and tasksList is returned empty', () => {
-        // mockUseGetTasks.mockReturnValue({
-        //     tasksList: [],
-        //     fetchState: 'success',
-        //     errorMessage: ''
-        // })
+        mockUseTasksContext.mockReturnValue(createMockReturnValue([], 'success', '', 1, () => {
+        }, true, () => {
+        }))
 
-        mockUseGetTasks.mockReturnValue(createMockReturnValue([], 'success', ''))
 
         render(<TaskList/>)
 
@@ -111,20 +129,36 @@ describe('TaskList Component', () => {
 
 
     it('renders all tasks as TaskCard components when fetchState is success and tasksList is not empty', () => {
+        mockUseTasksContext.mockReturnValue(createMockReturnValue([mockTask1, mockTask2], 'success', '', 1, () => {
+        }, true, () => {
+        }))
 
-        // mockUseGetTasks.mockReturnValue({
-        //     tasksList: mockTasks,
-        //     fetchState: 'success',
-        //     errorMessage: ''
-        // })
-
-        mockUseGetTasks.mockReturnValue(createMockReturnValue([mockTask1, mockTask2], 'success', ''))
 
         render(<TaskList/>)
 
         expect(screen.getByText('Complete Project')).toBeInTheDocument()
         expect(screen.getByText('Write Tests')).toBeInTheDocument()
     })
+
+    it("should renders Pagination when fetch is successful", () => {
+        vi.mocked(useTasksContext).mockReturnValue(createMockReturnValue([mockTask1], 'success', '', 12, (page:number) => {
+            console.log(page);
+        }, true, () => {
+        }));
+        render(<TaskList />);
+        expect(screen.getByText(`${12}`)).toBeInTheDocument();
+        expect(screen.getByText(`Next`)).toBeInTheDocument();
+        expect(screen.getByText(`Prev`)).toBeInTheDocument();
+    });
+
+    it("should renders TaskCard when fetch is successful", () => {
+        vi.mocked(useTasksContext).mockReturnValue(createMockReturnValue([mockTask1], 'success', '', 1, (page:number) => {
+            console.log(page);
+        }, true, () => {
+        }));
+        render(<TaskList />);
+        expect(screen.getByText(`${1}`)).toBeInTheDocument();
+    });
 
 })
 
