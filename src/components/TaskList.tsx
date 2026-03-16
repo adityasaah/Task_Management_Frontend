@@ -1,16 +1,10 @@
-import type {FetchState, TaskItem} from "../tasks/tasks.type.ts";
 import TaskCard from "./TaskCard.tsx";
+import { useTasksContext } from "../contexts/TasksContext.tsx";
+import {Pagination} from "./Pagination.tsx";
 
 
-interface TaskListProps {
-    tasksList: TaskItem[];
-    fetchState : FetchState;
-    errorMessage : string;
-}
-
-const TaskList = ({tasksList,fetchState,errorMessage} : TaskListProps ) => {
-
-
+const TaskList = () => {
+    const { tasksList, fetchState, errorMessage, page, onPageChange, hasMore } = useTasksContext();
 
     if (fetchState === "loading") return <LoadingView/>;
     if (fetchState === "error") return <ErrorView message={errorMessage}/>;
@@ -20,6 +14,7 @@ const TaskList = ({tasksList,fetchState,errorMessage} : TaskListProps ) => {
             <div data-testid="tasks-grid" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 {tasksList.map((task) => <TaskCard key={task.id} task={task}/>)}
             </div>
+            <Pagination page={page} onPageChange={onPageChange} hasMore={hasMore} hasPrev={page > 1} />
         </div>
     )
 }
