@@ -1,12 +1,15 @@
-import React, {useState} from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { submitTask } from './services/tasks.service';
+
 
 interface CreateTaskFormProps {
     onClose: () => void;
     refetch: () => void;
 }
 
-const CreateTaskForm: React.FC<CreateTaskFormProps> = ({onClose,refetch}) => {
+
+
+const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose, refetch }) => {
 
     const [formData, setFormData] = useState({
         title: '',
@@ -18,24 +21,21 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({onClose,refetch}) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: name === 'currentProgress' || name === 'targetProgress' ? Number(value) : value
         }));
     };
 
+
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         try {
-            const newTask = {
-                ...formData
-            };
-
-            const response = await axios.post('http://localhost:3000/tasks', newTask);
-            console.log(response);
+            await submitTask(formData);
             refetch();
             onClose();
         } catch (error) {
@@ -44,6 +44,7 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({onClose,refetch}) => {
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
