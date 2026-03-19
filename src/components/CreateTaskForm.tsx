@@ -85,12 +85,11 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose, refetch }) => 
                         Current Progress
                     </label>
                     <input
-                        type="number"
+                        type="text"
                         id="currentProgress"
                         name="currentProgress"
                         value={formData.currentProgress}
                         onChange={handleChange}
-                        min="0"
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -101,12 +100,11 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onClose, refetch }) => 
                         Target Progress
                     </label>
                     <input
-                        type="number"
+                        type="text"
                         id="targetProgress"
                         name="targetProgress"
                         value={formData.targetProgress}
                         onChange={handleChange}
-                        min="1"
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
