@@ -12,7 +12,7 @@ const TaskList = () => {
     return (
         <div data-testid="outer-container" >
             <div data-testid="tasks-grid" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-                {tasksList.map((task) => <TaskCard key={task.id} task={task}/>)}
+                {tasksList && tasksList.map((task) => <TaskCard key={task.id} task={task}/>)}
             </div>
             <Pagination page={page} onPageChange={onPageChange} hasMore={hasMore} hasPrev={page > 1} />
         </div>
