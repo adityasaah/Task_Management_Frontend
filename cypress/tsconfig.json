@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es5", "dom"],
+    "types": ["cypress", "node", "@testing-library/cypress"],
+    "jsx": "react-jsx"        // ← add this line
+  },
+  "include": [
+    "**/*.cy.ts",
+    "**/*.cy.tsx",
+    "support/**/*.ts",
+    "../../src/**/*.tsx",     // ← include src components
+    "../../src/**/*.ts",
+    "../node_modules/cypress/types"
+  ]
+}
